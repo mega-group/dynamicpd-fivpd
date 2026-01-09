@@ -15,3 +15,10 @@ You may make a pull request and make edits to the code. You may not redistribute
 We want to make sure you can do a whole lot of things with FivePD JSON. If there's something that you want to do that you cannot please let us know so we can work on making it work!
 
 We are also working on FivePD JSON but for plugins. This will also allow you to make even more things!
+
+## Branches
+`main` = this branch holds the fxmanifest.lua for the updater & .txt file for the basic callouts for updating purposes
+
+`development` = the fivepd-json (aka json-dynamic) **callout** code -- `plugin-development` is the **plugin** varient which is still under development
+
+`gh-pages` = an area where you may link to your callouts/plugins made for this FivePD Callout/Plugin (or whatever you wish to refer to it as)
