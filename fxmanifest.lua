@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Mega Utilities\' Mega Group'
 description 'This resource checks for updates for the callout & plugin dynamicpd'
-version '1.0.1'
+version '1.0.3'
 pre_version '1.0.3'
 
 
