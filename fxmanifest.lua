@@ -9,6 +9,10 @@ pre_version '1.0.2'
 
 server_script 'updater.lua'
 
+changelog_1_0_3 [[
+- Enhance Updater once more (prepare for FivePD V2?)
+]]
+
 changelog_1_0_2 [[
 - Use fxmanifest in FivePD to load files
 - Enhance logging and added more debug options to set in config (printToConsole & debugToConsole)
