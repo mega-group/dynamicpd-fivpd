@@ -25,7 +25,7 @@
     .then(response => response.json())
     .then(data => {
       const container = document.getElementById('calloutList');
-      const currentVersion = parseFloat(data.fivepd_json_version);
+      const currentVersion = parseFloat(data.dynamicpd_version);
 
       data.callouts.forEach(callout => {
         const cardWrapper = document.createElement('div');
@@ -34,7 +34,7 @@
         const card = document.createElement('div');
         card.className = 'card h-100 bg-light text-dark';
 
-        const calloutVersion = parseFloat(callout.for_fivepd_json_version ?? '1.0');
+        const calloutVersion = parseFloat(callout.for_dynamicpd_version ?? '1.0');
         let badgeColor = 'bg-success';
 
         if (calloutVersion < currentVersion) {
@@ -60,7 +60,7 @@
           ${imageHTML}
           <div class="card-body">
             <h5 class="card-title">${callout.name}</h5>
-            ${callout.for_fivepd_json_version ? `<span class="badge rounded-pill ${badgeColor} mb-2">FivePD-JSON ${callout.for_fivepd_json_version}</span>` : ''}
+            ${callout.for_dynamicpd_version ? `<span class="badge rounded-pill ${badgeColor} mb-2">dynamicpd ${callout.for_dynamicpd_version}</span>` : ''}
             ${callout.version ? `<span class="badge rounded-pill bg-primary mb-2">Callout v${callout.version}</span>` : ''}
             <p class="card-text">${callout.description}</p>
             <a href="${callout.downloadURL}" class="btn btn-primary">Download</a>
