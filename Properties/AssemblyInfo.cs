@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("fivepd_json_plugin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("dynamicpd_plugin")]
+[assembly: AssemblyDescription("This is the plugin for dynamicpd create your own plugins using only json & lua files!")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("fivepd_json_plugin")]
-[assembly: AssemblyCopyright("Copyright ©  2025")]
+[assembly: AssemblyCompany("Mega Utilities Company")]
+[assembly: AssemblyProduct("dynamicpd")]
+[assembly: AssemblyCopyright("Copyright © Mega Utilities' Mega Group 2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

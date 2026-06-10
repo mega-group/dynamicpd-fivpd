@@ -9,7 +9,7 @@ using static CitizenFX.Core.Native.API;
 using FivePD.API;
 using Newtonsoft.Json;
 
-namespace fivepd.json_event_exports
+namespace dynamicpd_event_exports
 {
     class exports : BaseScript
     {
@@ -17,8 +17,8 @@ namespace fivepd.json_event_exports
 
         public exports()
         {
-            EventHandlers["fivepd_json_exports:OnDuty"] += new Action<bool>(OnDutyChanged);
-            EventHandlers["fivepd_json_exports:OffDuty"] += new Action(OffDuty);
+            EventHandlers["dynamicpd_exports:OnDuty"] += new Action<bool>(OnDutyChanged);
+            EventHandlers["dynamicpd_exports:OffDuty"] += new Action(OffDuty);
 
             Events.OnDutyStatusChange += OnDutyChange;
         }

@@ -54,7 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonPluginBridge.cs" />
+    <Compile Include="dynamicpd.cs" />
     <Compile Include="Exports.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
