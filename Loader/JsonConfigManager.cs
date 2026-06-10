@@ -22,7 +22,7 @@ namespace dynamicpd.Loader
         {
             if (Configs.Count > 0) return;
 
-            var manifestJson = LoadResourceFile(GetCurrentResourceName(), "callouts/json_callouts/manifest.json");
+            var manifestJson = LoadResourceFile(GetCurrentResourceName(), "callouts/dynamicpd_callouts/manifest.json");
             if (string.IsNullOrEmpty(manifestJson))
             {
                 Debug.WriteLine("[JsonConfigManager] Could not load manifest.json");
@@ -48,7 +48,7 @@ namespace dynamicpd.Loader
 
             foreach (var fileName in files)
             {
-                var json = LoadResourceFile(GetCurrentResourceName(), $"callouts/json_callouts/{fileName}");
+                var json = LoadResourceFile(GetCurrentResourceName(), $"callouts/dynamicpd_callouts/{fileName}");
                 if (string.IsNullOrEmpty(json))
                 {
                     Debug.WriteLine($"[JsonConfigManager] Could not load {fileName}");
@@ -87,7 +87,7 @@ namespace dynamicpd.Loader
                 int byteLen = Encoding.UTF8.GetBytes(payload).Length;
                 checkedCallouts.Add(cfg.shortName);
 
-                BaseScript.TriggerServerEvent("json:checkUpdate", cfg.shortName, cfg.version, cfg.updateURL);
+                BaseScript.TriggerServerEvent("dynamicpd:checkUpdate", cfg.shortName, cfg.version, cfg.updateURL);
             }
         }
 

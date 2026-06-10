@@ -41,7 +41,8 @@ namespace dynamicpd_callout
                 behavior = "fight",
                 vehicleModel = "SULTAN",
                 heading = 180f,
-                debug = false
+                debug = false,
+                CFGGen = false
             };
 
             if (config.debug == true)
@@ -260,20 +261,20 @@ namespace dynamicpd_callout
                         suspect.Ped.SetData(pedData);
                         Utilities.SetPedData(suspect.Ped.NetworkId, pedData);
                         DebugHelper.Log($"[JsonBridge] Applied PedData to {suspect.Ped.Handle}:\n" +
-    $"- Name: {pedData.FirstName} {pedData.LastName}\n" +
-    $"- DOB: {pedData.DateOfBirth}, Age: {pedData.Age}, Gender: {pedData.Gender}\n" +
-    $"- Address: {pedData.Address}\n" +
-    $"- Warrant: {pedData.Warrant}\n" +
-    $"- BloodAlcoholLevel: {pedData.BloodAlcoholLevel}\n" +
-    $"- UsedDrugs: {string.Join(", ", pedData.UsedDrugs)}\n" +
-    $"- Licenses:\n" +
-    $"  • Driver: {(pedData.DriverLicense?.LicenseStatus)}\n" +
-    $"  • Weapon: {(pedData.WeaponLicense?.LicenseStatus)}\n" +
-    $"  • Hunting: {(pedData.HuntingLicense?.LicenseStatus)}\n" +
-    $"  • Fishing: {(pedData.FishingLicense?.LicenseStatus)}\n" +
-    $"- Items: {string.Join(", ", pedData.Items.Select(i => $"{i.Name} ({(i.IsIllegal ? "Illegal" : "Legal")})"))}\n" +
-    $"- Violations: {string.Join(", ", pedData.Violations.Select(v => $"{v.Offence} ({v.Charge})"))}",
-    "INFO");
+                        $"- Name: {pedData.FirstName} {pedData.LastName}\n" +
+                        $"- DOB: {pedData.DateOfBirth}, Age: {pedData.Age}, Gender: {pedData.Gender}\n" +
+                        $"- Address: {pedData.Address}\n" +
+                        $"- Warrant: {pedData.Warrant}\n" +
+                        $"- BloodAlcoholLevel: {pedData.BloodAlcoholLevel}\n" +
+                        $"- UsedDrugs: {string.Join(", ", pedData.UsedDrugs)}\n" +
+                        $"- Licenses:\n" +
+                        $"  • Driver: {(pedData.DriverLicense?.LicenseStatus)}\n" +
+                        $"  • Weapon: {(pedData.WeaponLicense?.LicenseStatus)}\n" +
+                        $"  • Hunting: {(pedData.HuntingLicense?.LicenseStatus)}\n" +
+                        $"  • Fishing: {(pedData.FishingLicense?.LicenseStatus)}\n" +
+                        $"- Items: {string.Join(", ", pedData.Items.Select(i => $"{i.Name} ({(i.IsIllegal ? "Illegal" : "Legal")})"))}\n" +
+                        $"- Violations: {string.Join(", ", pedData.Violations.Select(v => $"{v.Offence} ({v.Charge})"))}",
+                        "INFO");
                         DebugHelper.Log($"[JsonBridge] Full PedData JSON:\n{JsonConvert.SerializeObject(defaultPedData, Formatting.Indented)}", "DEBUG");
                     }
 
@@ -307,11 +308,11 @@ namespace dynamicpd_callout
                         suspect.Vehicle.SetData(vehData);
                         Utilities.SetVehicleData(suspect.Vehicle.NetworkId, vehData);
                         DebugHelper.Log($"[JsonBridge] Applied VehicleData to vehicle {suspect.Vehicle.Handle}:\n" +
-    $"- License Plate: {vehData.LicensePlate}\n" +
-    $"- Insurance: {(vehData.Insurance ? "Valid" : "Invalid")}\n" +
-    $"- Registration: {(vehData.Registration ? "Valid" : "Invalid")}\n" +
-    $"- Items: {string.Join(", ", vehData.Items.Select(i => $"{i.Name} ({(i.IsIllegal ? "Illegal" : "Legal")})"))}",
-    "INFO");
+                        $"- License Plate: {vehData.LicensePlate}\n" +
+                        $"- Insurance: {(vehData.Insurance ? "Valid" : "Invalid")}\n" +
+                        $"- Registration: {(vehData.Registration ? "Valid" : "Invalid")}\n" +
+                        $"- Items: {string.Join(", ", vehData.Items.Select(i => $"{i.Name} ({(i.IsIllegal ? "Illegal" : "Legal")})"))}",
+                        "INFO");
                         DebugHelper.Log($"[JsonBridge] Full VehicleData JSON:\n{JsonConvert.SerializeObject(vehData, Formatting.Indented)}", "DEBUG");
                     }
 
@@ -458,6 +459,9 @@ namespace dynamicpd_callout
                 {
                     if (s?.Ped != null && s.Ped.Exists())
                     {
+                        DebugHelper.Log($"[JsonBridge] Removing blip for suspect ped {s.Ped.Handle}");
+                        Utilities.SyncBlipDelete(s.PedBlip);
+
                         DebugHelper.Log($"[JsonBridge] Cleaning suspect: {s.Ped.Handle}");
                         s.PedBlip?.Delete();
 
@@ -470,6 +474,7 @@ namespace dynamicpd_callout
 
                     if (s?.Vehicle != null && s.Vehicle.Exists())
                     {
+                        Utilities.SyncBlipDelete(s.VehBlip);
                         s.VehBlip?.Delete();
                         s.Vehicle.Delete();
                         DebugHelper.Log($"[JsonBridge] Deleted suspect vehicle {s.Vehicle.Handle}.");

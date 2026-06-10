@@ -7,8 +7,8 @@
     <ProjectGuid>{695BAF66-8E7D-41DD-ABBB-6CF33FB209E9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fivepd_json.net</RootNamespace>
-    <AssemblyName>fivepd-json.net</AssemblyName>
+    <RootNamespace>dynamicpd.net</RootNamespace>
+    <AssemblyName>dynamicpd.net</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
