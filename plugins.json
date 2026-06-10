@@ -1,7 +1,7 @@
 {
   "comment": "FORK TO ADD YOUR OWN PLUGINS HERE AND SUBMIT A PULL REQUEST -- MORE ADVANCED WEBSITE MAY BE INTRODUCED IN THE FUTURE",
   "dynamicpd_version": "1.0.1",
-  "callouts": [
+  "plugins": [
     {
       "uid": "burg-callout",
       "version": "1.0",
