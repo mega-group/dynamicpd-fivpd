@@ -133,4 +133,5 @@ namespace dynamicpd.Loader
         {
             return Configs.Find(cfg => cfg.shortName.Equals(shortName, StringComparison.OrdinalIgnoreCase));
         }
+    }
 }
