@@ -12,6 +12,7 @@ namespace dynamicpd.Loader
     {
         public static List<CalloutConfig> Configs { get; private set; }
         private static HashSet<string> checkedCallouts = new HashSet<string>();
+
         static JsonConfigManager()
         {
             Configs = new List<CalloutConfig>();
@@ -22,31 +23,58 @@ namespace dynamicpd.Loader
         {
             if (Configs.Count > 0) return;
 
-            var manifestJson = LoadResourceFile(GetCurrentResourceName(), "callouts/dynamicpd_callouts/manifest.json");
-            if (string.IsNullOrEmpty(manifestJson))
+            List<string> filesToLoad = new List<string>();
+
+            // Attempt to load from fxmanifest.lua
+            var fxmanifest = LoadResourceFile(GetCurrentResourceName(), "fxmanifest.lua");
+            if (!string.IsNullOrEmpty(fxmanifest))
             {
-                Debug.WriteLine("[JsonConfigManager] Could not load manifest.json");
+                var matches = System.Text.RegularExpressions.Regex.Matches(
+                    fxmanifest,
+                    @"callouts\/dynamicpd_callouts\/([A-Za-z0-9_\-\.]+\.json)"
+                );
+
+                foreach (System.Text.RegularExpressions.Match m in matches)
+                {
+                    filesToLoad.Add(m.Groups[1].Value);
+                }
+
+                if (filesToLoad.Count > 0)
+                {
+                    Debug.WriteLine("[JsonConfigManager] Loaded callout list from fxmanifest.lua.");
+                }
+            }
+
+            // Fallback to manifest.json if no files were found in fxmanifest
+            if (filesToLoad.Count == 0)
+            {
+                var manifestJson = LoadResourceFile(GetCurrentResourceName(), "callouts/dynamicpd_callouts/manifest.json");
+                if (!string.IsNullOrEmpty(manifestJson))
+                {
+                    try
+                    {
+                        filesToLoad = JsonConvert.DeserializeObject<List<string>>(manifestJson) ?? new List<string>();
+                        if (filesToLoad.Count > 0)
+                        {
+                            Debug.WriteLine("[JsonConfigManager] Loaded callout list from manifest.json fallback.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[JsonConfigManager] Failed to parse manifest.json fallback: {ex.Message}");
+                    }
+                }
+            }
+
+            // Abort if both methods failed to find any files
+            if (filesToLoad.Count == 0)
+            {
+                Debug.WriteLine("[JsonConfigManager] No callout configuration files found in fxmanifest.lua or manifest.json.");
                 return;
             }
 
-            List<string> files;
-            try
-            {
-                files = JsonConvert.DeserializeObject<List<string>>(manifestJson);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[JsonConfigManager] Failed to parse manifest.json: {ex.Message}");
-                return;
-            }
-
-            if (files == null || files.Count == 0)
-            {
-                Debug.WriteLine("[JsonConfigManager] Manifest.json is empty or invalid");
-                return;
-            }
-
-            foreach (var fileName in files)
+            // Parse the configs using our populated list
+            foreach (var fileName in filesToLoad)
             {
                 var json = LoadResourceFile(GetCurrentResourceName(), $"callouts/dynamicpd_callouts/{fileName}");
                 if (string.IsNullOrEmpty(json))
@@ -74,6 +102,7 @@ namespace dynamicpd.Loader
                 }
             }
 
+            // Run the update checker
             foreach (var cfg in Configs)
             {
                 if (checkedCallouts.Contains(cfg.shortName))
@@ -81,11 +110,11 @@ namespace dynamicpd.Loader
 
                 if (string.IsNullOrEmpty(cfg.updateURL) || string.IsNullOrEmpty(cfg.version)) continue;
 
-                var argsArray = new object[] { cfg.shortName, cfg.version, cfg.updateURL };
+                checkedCallouts.Add(cfg.shortName);
 
+                var argsArray = new object[] { cfg.shortName, cfg.version, cfg.updateURL };
                 string payload = JsonConvert.SerializeObject(argsArray);
                 int byteLen = Encoding.UTF8.GetBytes(payload).Length;
-                checkedCallouts.Add(cfg.shortName);
 
                 BaseScript.TriggerServerEvent("dynamicpd:checkUpdate", cfg.shortName, cfg.version, cfg.updateURL);
             }
