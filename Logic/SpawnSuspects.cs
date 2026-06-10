@@ -5,10 +5,10 @@ using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using FivePD.API;
 using FivePD.API.Utils;
-using fivepd_json.Helpers;
-using fivepd_json.models;
+using dynamicpd.Helpers;
+using dynamicpd.models;
 
-namespace fivepd_json.Logic
+namespace dynamicpd.Logic
 {
     public static class SpawnSuspects
     {
@@ -71,7 +71,8 @@ namespace fivepd_json.Logic
         private static async Task<SpawnedSuspect> CreatePedWithConfig(SuspectConfig cfg, Vector3 position, Dictionary<string, Vehicle> sharedVehicles = null)
         {
 
-            var pedModel = new Model(cfg.pedModel ?? GetRandomPedModel());
+            var pedModel = new Model(string.IsNullOrEmpty(cfg.pedModel) ? GetRandomPedModel() : cfg.pedModel);
+
             await pedModel.Request(3000);
             if (!pedModel.IsLoaded) return null;
 

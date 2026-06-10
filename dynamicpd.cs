@@ -6,19 +6,19 @@ using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using FivePD.API;
 using FivePD.API.Utils;
-using fivepd_json.Behavior;
-using fivepd_json.Helpers;
-using fivepd_json.Loader;
-using fivepd_json.Logic;
-using fivepd_json.models;
+using dynamicpd.Behavior;
+using dynamicpd.Helpers;
+using dynamicpd.Loader;
+using dynamicpd.Logic;
+using dynamicpd.models;
 using Newtonsoft.Json;
 using static CitizenFX.Core.Native.API;
-using static fivepd_json.Logic.SpawnSuspects;
+using static dynamicpd.Logic.SpawnSuspects;
 
-namespace fivepd.json
+namespace dynamicpd_callout
 {
-    [CalloutProperties("json-dynamic", "Mega Group", "1.0.0")]
-    public class JsonBridge : Callout
+    [CalloutProperties("dynamicpd", "Mega Group", "1.0.0")]
+    public class dynamicpd : Callout
     {
         private CalloutConfig config;
         private Vector3 finalLocation;
@@ -29,11 +29,11 @@ namespace fivepd.json
         private bool suspectsInitialized = false;
         private Func<Task> suspectMonitorTickHandler;
         
-        public JsonBridge()
+        public dynamicpd()
         {
             config = JsonConfigManager.GetRandomConfig() ?? new CalloutConfig
             {
-                shortName = "json-dynamic",
+                shortName = "dynamicpd",
                 description = "Default fallback scenario",
                 responseCode = 3,
                 pedModel = "a_m_y_skater_01",

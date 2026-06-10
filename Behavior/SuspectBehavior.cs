@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using FivePD.API;
-using fivepd_json.Helpers;
+using dynamicpd.Helpers;
 
-namespace fivepd_json.Behavior
+namespace dynamicpd.Behavior
 {
     public static class SuspectBehavior
     {

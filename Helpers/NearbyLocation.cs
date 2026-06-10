@@ -4,7 +4,7 @@ using CitizenFX.Core.Native;
 using static CitizenFX.Core.Native.API;
 
 
-namespace fivepd_json.Helpers
+namespace dynamicpd.Helpers
 {
     public static class NearbyLocation
     {

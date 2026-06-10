@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using CitizenFX.Core;
-using fivepd_json.models;
+using dynamicpd.models;
 using Newtonsoft.Json;
 using static CitizenFX.Core.Native.API;
 
-namespace fivepd_json.Loader
+namespace dynamicpd.Loader
 {
     public static class JsonConfigManager
     {

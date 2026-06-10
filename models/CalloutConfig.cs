@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace fivepd_json.models
+namespace dynamicpd.models
 {
     public class CalloutConfig
     {

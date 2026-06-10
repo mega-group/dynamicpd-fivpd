@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CitizenFX.Core;
-using fivepd_json.models;
-using fivepd_json.Helpers;
+using dynamicpd.models;
+using dynamicpd.Helpers;
 
-namespace fivepd_json.Logic
+namespace dynamicpd.Logic
 {
     public static class VictimSpawner
     {

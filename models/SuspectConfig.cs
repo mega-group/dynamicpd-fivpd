@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 
-namespace fivepd_json.models
+namespace dynamicpd.models
 {
     public class SuspectConfig
     {

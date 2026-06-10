@@ -61,7 +61,7 @@
     <Compile Include="Helpers\Debug.cs" />
     <Compile Include="Helpers\MonitorSuspectState.cs" />
     <Compile Include="Helpers\NearbyLocation.cs" />
-    <Compile Include="JsonBridge.cs" />
+    <Compile Include="dynamicpd.cs" />
     <Compile Include="Loader\JsonConfigManager.cs" />
     <Compile Include="Logic\SpawnSuspects.cs" />
     <Compile Include="Logic\SpawnVictims.cs" />

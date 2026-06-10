@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace fivepd_json.Behavior
+namespace dynamicpd.Behavior
 {
     internal class VictimBehavior
     {

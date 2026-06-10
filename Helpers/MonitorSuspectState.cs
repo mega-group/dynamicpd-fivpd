@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CitizenFX.Core;
 
-namespace fivepd_json.Helpers
+namespace dynamicpd.Helpers
 {
     public static class SuspectMonitor
     {

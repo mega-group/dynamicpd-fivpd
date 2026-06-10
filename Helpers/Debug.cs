@@ -1,8 +1,8 @@
 ﻿using System;
 using CitizenFX.Core;
-using fivepd_json.models;
+using dynamicpd.models;
 
-namespace fivepd_json.Helpers
+namespace dynamicpd.Helpers
 {
     public static class DebugHelper
     {

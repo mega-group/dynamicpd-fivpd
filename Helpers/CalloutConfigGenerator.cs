@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using fivepd_json.Helpers;
-using fivepd_json.models;
+using dynamicpd.models;
 using Newtonsoft.Json;
 
 public static class JsonTemplateGenerator
