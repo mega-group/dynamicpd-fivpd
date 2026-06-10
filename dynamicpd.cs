@@ -43,20 +43,11 @@ namespace dynamicpd_callout
                 heading = 180f,
                 debug = false,
                 CFGGen = false,
+                debugToConsole = false,
                 printToConsole = false
             };
 
-            if (config.debug == true && config.printToConsole == false)
-            {
-                DebugHelper.EnableDebug(true, config.shortName, false);
-            }
-
-            if (config.debug == true && config.printToConsole == true)
-            {
-                DebugHelper.EnableDebug(true, config.shortName, true);
-            }
-
-            if (config.CFGGen == true)
+            if (config.CFGGen)
             {
                 JsonTemplateGenerator.GenerateBlankCalloutTemplate();
             }
@@ -131,7 +122,7 @@ namespace dynamicpd_callout
             ResponseCode = config.responseCode;
             StartDistance = (config.startDistance > 5) ? config.startDistance : 250f;
 
-            DebugHelper.Log($"[JsonBridge] Selected config: {config.shortName}", "_");
+            DebugHelper.Log(config, $"[dynamicpd_callout] Selected config: {config.shortName}", "_");
         }
 
         public override async Task OnAccept()
@@ -139,7 +130,7 @@ namespace dynamicpd_callout
             spawnedSuspects.Clear();
             spawnedVictims.Clear();
 
-            DebugHelper.Log("[JsonBridge] Callout Accepted:" +
+            DebugHelper.Log(config, "[dynamicpd_callout] Callout Accepted:" +
                 $"\n  shortName: {config.shortName}" +
                 $"\n  description: {config.description}" +
                 $"\n  responseCode: {config.responseCode}" +
@@ -156,6 +147,7 @@ namespace dynamicpd_callout
                 $"\n  location: {(config.location != null ? $"({config.location.x}, {config.location.y}, {config.location.z})" : "null")}" +
                 $"\n  locations: {(config.locations?.Count.ToString() ?? "null")}", "SUCCESS"
             );
+            DebugHelper.Log(config, $"Full Config JSON:\n{JsonConvert.SerializeObject(config, Formatting.Indented)}", "DEBUG");
 
             float groundZ = World.GetGroundHeight(finalLocation);
             var spawnBase = new Vector3(finalLocation.X, finalLocation.Y, groundZ);
@@ -177,7 +169,7 @@ namespace dynamicpd_callout
 
                 if (spawnedSuspects.Count == 0)
                 {
-                    DebugHelper.Log("[JsonBridge] No suspects spawned!", "WARN");
+                    DebugHelper.Log(config, "[dynamicpd_callout] No suspects spawned!", "WARN");
                     return;
                 }
 
@@ -200,8 +192,8 @@ namespace dynamicpd_callout
                         var pedData = await suspect.Ped.GetData();
 
                         pedData.FirstName = !string.IsNullOrWhiteSpace(cfg.firstName)
-    ? cfg.firstName
-    : defaultPedData.FirstName;
+                        ? cfg.firstName
+                        : defaultPedData.FirstName;
 
                         pedData.LastName = !string.IsNullOrWhiteSpace(cfg.lastName)
                             ? cfg.lastName
@@ -265,7 +257,7 @@ namespace dynamicpd_callout
 
                         suspect.Ped.SetData(pedData);
                         Utilities.SetPedData(suspect.Ped.NetworkId, pedData);
-                        DebugHelper.Log($"[JsonBridge] Applied PedData to {suspect.Ped.Handle}:\n" +
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Applied PedData to {suspect.Ped.Handle}:\n" +
                         $"- Name: {pedData.FirstName} {pedData.LastName}\n" +
                         $"- DOB: {pedData.DateOfBirth}, Age: {pedData.Age}, Gender: {pedData.Gender}\n" +
                         $"- Address: {pedData.Address}\n" +
@@ -280,7 +272,7 @@ namespace dynamicpd_callout
                         $"- Items: {string.Join(", ", pedData.Items.Select(i => $"{i.Name} ({(i.IsIllegal ? "Illegal" : "Legal")})"))}\n" +
                         $"- Violations: {string.Join(", ", pedData.Violations.Select(v => $"{v.Offence} ({v.Charge})"))}",
                         "INFO");
-                        DebugHelper.Log($"[JsonBridge] Full PedData JSON:\n{JsonConvert.SerializeObject(defaultPedData, Formatting.Indented)}", "DEBUG");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Full PedData JSON:\n{JsonConvert.SerializeObject(defaultPedData, Formatting.Indented)}", "DEBUG");
                     }
 
                     if (suspect.Vehicle != null && suspect.VehicleData?.Count > 0)
@@ -312,13 +304,13 @@ namespace dynamicpd_callout
 
                         suspect.Vehicle.SetData(vehData);
                         Utilities.SetVehicleData(suspect.Vehicle.NetworkId, vehData);
-                        DebugHelper.Log($"[JsonBridge] Applied VehicleData to vehicle {suspect.Vehicle.Handle}:\n" +
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Applied VehicleData to vehicle {suspect.Vehicle.Handle}:\n" +
                         $"- License Plate: {vehData.LicensePlate}\n" +
                         $"- Insurance: {(vehData.Insurance ? "Valid" : "Invalid")}\n" +
                         $"- Registration: {(vehData.Registration ? "Valid" : "Invalid")}\n" +
                         $"- Items: {string.Join(", ", vehData.Items.Select(i => $"{i.Name} ({(i.IsIllegal ? "Illegal" : "Legal")})"))}",
                         "INFO");
-                        DebugHelper.Log($"[JsonBridge] Full VehicleData JSON:\n{JsonConvert.SerializeObject(vehData, Formatting.Indented)}", "DEBUG");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Full VehicleData JSON:\n{JsonConvert.SerializeObject(vehData, Formatting.Indented)}", "DEBUG");
                     }
 
                     if (suspect.Questions != null && suspect.Questions.Count > 0)
@@ -345,10 +337,10 @@ namespace dynamicpd_callout
                         foreach (var question in pedQuestions)
                         {
                             int answerCount = question.Answers?.Count ?? 0;
-                            DebugHelper.Log($"Question: \"{question.Question}\" has {answerCount} answer(s)", "INFO");
+                            DebugHelper.Log(config, $"Question: \"{question.Question}\" has {answerCount} answer(s)", "INFO");
                         }
 
-                        DebugHelper.Log($"[JsonBridge] Added {pedQuestions.Count} question(s) to ped {suspect.Ped.Handle}", "INFO");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Added {pedQuestions.Count} question(s) to ped {suspect.Ped.Handle}", "INFO");
                     }
                 }
 
@@ -356,7 +348,7 @@ namespace dynamicpd_callout
             }
             catch (Exception ex)
             {
-                DebugHelper.Log($"[JsonBridge] Exception during OnAccept: {ex}", "ERROR");
+                DebugHelper.Log(config, $"[dynamicpd_callout] Exception during OnAccept: {ex}", "ERROR");
             }
         }
         
@@ -407,11 +399,11 @@ namespace dynamicpd_callout
                 AssignedPlayers.Add(Game.PlayerPed);
             }
 
-            DebugHelper.Log("[JsonBridge] OnStart triggered.", "SUCCESS");
+            DebugHelper.Log(config, "[dynamicpd_callout] OnStart triggered.", "SUCCESS");
 
             if (!suspectsInitialized)
             {
-                DebugHelper.Log("[JsonBridge] suspects not initialized, skipping OnStart logic.", "WARN");
+                DebugHelper.Log(config, "[dynamicpd_callout] suspects not initialized, skipping OnStart logic.", "WARN");
                 return;
             }
 
@@ -421,28 +413,28 @@ namespace dynamicpd_callout
                 {
                     try
                     {
-                        DebugHelper.Log($"[JsonBridge] Applying behavior {s.Behavior}");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Applying behavior {s.Behavior}");
                         SuspectBehavior.HandleBehavior(s.Ped, s.Behavior);
                         if (s.pursuit == true)
                         {
-                            DebugHelper.Log($"[JsonBridge] Suspect {s.Ped.Handle} is set to pursue.", "INFO");
+                            DebugHelper.Log(config, $"[dynamicpd_callout] Suspect {s.Ped.Handle} is set to pursue.", "INFO");
                             var pursuit = Pursuit.RegisterPursuit(s.Ped);
                             bool isVehiclePursuit = s.Ped.IsInVehicle();
 
                             pursuit.Init(isVehiclePursuit, 35f, 50f, true);
                             pursuit.ActivatePursuit();
 
-                            DebugHelper.Log($"[JsonBridge] Registered {(isVehiclePursuit ? "vehicle" : "foot")} pursuit for ped {s.Ped.Handle}", "INFO");
+                            DebugHelper.Log(config, $"[dynamicpd_callout] Registered {(isVehiclePursuit ? "vehicle" : "foot")} pursuit for ped {s.Ped.Handle}", "INFO");
                         }
                     }
                     catch (Exception ex)
                     {
-                        DebugHelper.Log($"[JsonBridge] Error in HandleBehavior: {ex}", "ERROR");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Error in HandleBehavior: {ex}", "ERROR");
                     }
                 }
                 else
                 {
-                    DebugHelper.Log("[JsonBridge] Suspect Ped is null or does not exist.", "WARN");
+                    DebugHelper.Log(config, "[dynamicpd_callout] Suspect Ped is null or does not exist.", "WARN");
                 }
             }
 
@@ -456,7 +448,7 @@ namespace dynamicpd_callout
         public override void OnCancelBefore()
         {
             base.OnCancelBefore();
-            DebugHelper.Log("[JsonBridge] Starting entity cleanup...", "SUCCESS");
+            DebugHelper.Log(config, "[dynamicpd_callout] Starting entity cleanup...", "SUCCESS");
 
             try
             {
@@ -464,17 +456,17 @@ namespace dynamicpd_callout
                 {
                     if (s?.Ped != null && s.Ped.Exists())
                     {
-                        DebugHelper.Log($"[JsonBridge] Removing blip for suspect ped {s.Ped.Handle}");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Removing blip for suspect ped {s.Ped.Handle}");
                         Utilities.SyncBlipDelete(s.PedBlip);
 
-                        DebugHelper.Log($"[JsonBridge] Cleaning suspect: {s.Ped.Handle}");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Cleaning suspect: {s.Ped.Handle}");
                         s.PedBlip?.Delete();
 
                         s.Ped.IsPersistent = false;
-                        DebugHelper.Log($"[JsonBridge] Set suspect {s.Ped.Handle} as non-persistent.");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Set suspect {s.Ped.Handle} as non-persistent.");
 
                         s.Ped.Delete();
-                        DebugHelper.Log($"[JsonBridge] Deleted suspect ped {s.Ped.Handle}.");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted suspect ped {s.Ped.Handle}.");
                     }
 
                     if (s?.Vehicle != null && s.Vehicle.Exists())
@@ -482,7 +474,7 @@ namespace dynamicpd_callout
                         Utilities.SyncBlipDelete(s.VehBlip);
                         s.VehBlip?.Delete();
                         s.Vehicle.Delete();
-                        DebugHelper.Log($"[JsonBridge] Deleted suspect vehicle {s.Vehicle.Handle}.");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted suspect vehicle {s.Vehicle.Handle}.");
                     }
                 }
 
@@ -491,19 +483,18 @@ namespace dynamicpd_callout
                     if (v != null && v.Exists())
                     {
                         v.Delete();
-                        DebugHelper.Log($"[JsonBridge] Deleted victim ped {v.Handle}.");
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted victim ped {v.Handle}.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                DebugHelper.Log($"[JsonBridge] Exception during cleanup: {ex}", "ERROR");
+                DebugHelper.Log(config, $"[dynamicpd_callout] Exception during cleanup: {ex}", "ERROR");
             }
 
             isCalloutFinished = true;
             Tick -= suspectMonitorTickHandler;
-            DebugHelper.Log("[JsonBridge] Entity cleanup complete.", "SUCCESS");
-            DebugHelper.EnableDebug(false);
+            DebugHelper.Log(config, "[dynamicpd_callout] Entity cleanup complete.", "SUCCESS");
         }
 
         public override void OnCancelAfter()

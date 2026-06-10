@@ -169,7 +169,7 @@ namespace dynamicpd.Logic
 
                     if (!assigned)
                     {
-                        DebugHelper.Log($"No available seats for ped {ped.Handle} in vehicle {vehicle.Handle}", "WARN");
+                        DebugHelper.Log("[dynamicpd_callout]", $"No available seats for ped {ped.Handle} in vehicle {vehicle.Handle}", "WARN");
                     }
                 }
             }

@@ -129,5 +129,8 @@ namespace dynamicpd.Loader
             var rnd = new Random();
             return Configs[rnd.Next(Configs.Count)];
         }
-    }
+        public static CalloutConfig GetConfigByShortName(string shortName)
+        {
+            return Configs.Find(cfg => cfg.shortName.Equals(shortName, StringComparison.OrdinalIgnoreCase));
+        }
 }

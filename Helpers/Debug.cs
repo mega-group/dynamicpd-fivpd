@@ -6,54 +6,60 @@ namespace dynamicpd.Helpers
 {
     public static class DebugHelper
     {
-        private static bool _debugEnabled = false;
-        private static string _calloutName = "Unknown";
-        private static bool _printToConsole = false;
-
-        public static void EnableDebug(bool enabled, string calloutName = "Unknown", bool print = false)
+        public static void Log(CalloutConfig config, string message, string level = "")
         {
-            _debugEnabled = enabled;
-            _calloutName = calloutName;
-            _printToConsole = print;
-        }
+            if (config == null || !config.debug) return;
 
-        public static void Log(string message, string level = "")
-        {
-            if (!_debugEnabled) return;
+            string formattedMessage = BuildLogString(config.shortName, message, level);
+
+            Debug.WriteLine(formattedMessage);
+            if (config.debugToConsole || config.printToConsole)
             {
-                string timestamp = DateTime.Now.ToString("hh:mm:ss tt");
-                string color;
-
-                switch (level.ToUpper())
-                {
-                    case "INFO":
-                        color = "^4"; // Blue
-                        break;
-                    case "SUCCESS":
-                        color = "^2"; // Green
-                        break;
-                    case "WARN":
-                        color = "^3"; // Yellow
-                        break;
-                    case "ERROR":
-                        color = "^1"; // Red
-                        break;
-                    case "DEBUG":
-                        color = "^6"; // Purple
-                        break;
-                    default:
-                        color = "^7"; // Default (white)
-                        break;
-                }
-
-                var cleanLevel = string.IsNullOrWhiteSpace(level) || level == "_" ? "" : $" [{level}]";
-                Debug.WriteLine($"{color}[{timestamp}]{cleanLevel} {message}"); // Client console only
-
-                if (_printToConsole)
-                {
-                    BaseScript.TriggerServerEvent("dynamicpd:consolePrint", $"{color}[{timestamp}]{cleanLevel} {message}"); // The updater is required by the server to be able to trigger this event
-                }
+                BaseScript.TriggerServerEvent("dynamicpd:consolePrint", formattedMessage);
             }
+        }
+        public static void Log(string prefix, string message, string level = "")
+        {
+            string formattedMessage = BuildLogString(prefix, message, level);
+
+            Debug.WriteLine(formattedMessage);
+            BaseScript.TriggerServerEvent("dynamicpd:consolePrint", formattedMessage);
+        }
+        private static string BuildLogString(string prefix, string message, string level)
+        {
+            string timestamp = DateTime.Now.ToString("hh:mm:ss tt");
+            string color;
+
+            switch ((level ?? "").ToUpper())
+            {
+                case "INFO":
+                    color = "^4"; // Blue
+                    break;
+
+                case "SUCCESS":
+                    color = "^2"; // Green
+                    break;
+
+                case "WARN":
+                    color = "^3"; // Yellow
+                    break;
+
+                case "ERROR":
+                    color = "^1"; // Red
+                    break;
+
+                case "DEBUG":
+                    color = "^6"; // Purple
+                    break;
+
+                default:
+                    color = "^7"; // Default (white)
+                    break;
+            }
+
+            var cleanLevel = string.IsNullOrWhiteSpace(level) || level == "_" ? "" : $" [{level.ToUpper()}]";
+
+            return $"{color}[{timestamp}] [{prefix}]{cleanLevel} {message}^7";
         }
     }
 }

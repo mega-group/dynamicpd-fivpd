@@ -21,7 +21,7 @@ namespace dynamicpd.Logic
 
                 var spawnPos = NearbyLocation.GetRandomNearbyLocation(origin);
                 var ped = await World.CreatePed(pedModel, spawnPos);
-                DebugHelper.Log("Spawned Victim: " + (ped != null ? ped.Handle.ToString() : "null"));
+                DebugHelper.Log("[dynamicpd_callout]", "Spawned Victim: " + (ped != null ? ped.Handle.ToString() : "null"));
                 if (ped == null) continue;
 
                 victims.Add(ped);

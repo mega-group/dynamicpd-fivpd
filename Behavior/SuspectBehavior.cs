@@ -16,7 +16,7 @@ namespace dynamicpd.Behavior
         {
             if (ped == null || !ped.Exists())
             {
-                DebugHelper.Log("[SuspectBehavior] Suspect ped is null or doesn't exist.");
+                DebugHelper.Log("[SuspectBehavior]", "[dynamicpd_callout] Suspect ped is null or doesn't exist.");
                 return;
             }
 
@@ -30,18 +30,18 @@ namespace dynamicpd.Behavior
                 }
                 catch (Exception ex)
                 {
-                    DebugHelper.Log($"[SuspectBehavior] Failed to access Game.PlayerPed: {ex.Message}");
+                    DebugHelper.Log("[SuspectBehavior]", $"[dynamicpd_callout] Failed to access Game.PlayerPed: {ex.Message}");
                     return;
                 }
             }
 
             if (playerPed == null || !playerPed.Exists())
             {
-                DebugHelper.Log("[SuspectBehavior] playerPed is still null or does not exist.");
+                DebugHelper.Log("[SuspectBehavior]", "[dynamicpd_callout] playerPed is still null or does not exist.");
                 return;
             }
 
-            DebugHelper.Log($"[JsonBridge] Handling behavior '{behavior}' for ped {ped.Handle} (target: {playerPed.Handle})");
+            DebugHelper.Log("[SuspectBehavior]", $"[dynamicpd_callout] Handling behavior '{behavior}' for ped {ped.Handle} (target: {playerPed.Handle})");
 
             switch ((behavior ?? "").ToLower())
             {
@@ -82,11 +82,11 @@ namespace dynamicpd.Behavior
                     break;
 
                 case "random":
-                    DebugHelper.Log("[SuspectBehavior] Behavior 'random' is not implemented.");
+                    DebugHelper.Log("[SuspectBehavior]", "[dynamicpd_callout] Behavior 'random' is not implemented.");
                     break;
 
                 default:
-                    DebugHelper.Log($"[SuspectBehavior] Unknown behavior: {behavior}");
+                    DebugHelper.Log("[SuspectBehavior]", "[dynamicpd_callout] Unknown behavior: {behavior}");
                     break;
             }
         }

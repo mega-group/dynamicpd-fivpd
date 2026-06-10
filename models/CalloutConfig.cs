@@ -26,6 +26,7 @@ namespace dynamicpd.models
         public bool debug { get; set; }
         public bool CFGGen { get; set; } // Internal to easily generate config files if needed
         public bool printToConsole { get; set; } // allow logging to server console for minimal information
+        public bool debugToConsole { get; set; } // allow logging of debug information to server console for callout developers without having to use client console
         public List<SuspectConfig> suspects { get; set; }
         public List<VictimConfig> victims { get; set; }
         public LocationData location { get; set; }
