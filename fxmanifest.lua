@@ -4,10 +4,19 @@ game 'gta5'
 author 'Mega Utilities\' Mega Group'
 description 'This resource checks for updates for the callout & plugin dynamicpd'
 version '1.0.1'
-pre_version '1.0.1'
+pre_version '1.0.2'
 
 
 server_script 'updater.lua'
+
+changelog_1_0_2 [[
+- Use fxmanifest in FivePD to load files
+- Enhance logging and added more debug options to set in config (printToConsole & debugToConsole)
+- Added a event in the updater for server-side console printing
+- Enhanced updater
+- complete rename to dynamicpd
+- & more
+]]
 
 changelog [[
 - Rebrand to dynamicpd
