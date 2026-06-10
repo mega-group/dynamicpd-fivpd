@@ -8,11 +8,13 @@ namespace dynamicpd.Helpers
     {
         private static bool _debugEnabled = false;
         private static string _calloutName = "Unknown";
+        private static bool _printToConsole = false;
 
-        public static void EnableDebug(bool enabled, string calloutName = "Unknown")
+        public static void EnableDebug(bool enabled, string calloutName = "Unknown", bool print = false)
         {
             _debugEnabled = enabled;
             _calloutName = calloutName;
+            _printToConsole = print;
         }
 
         public static void Log(string message, string level = "")
@@ -45,7 +47,12 @@ namespace dynamicpd.Helpers
                 }
 
                 var cleanLevel = string.IsNullOrWhiteSpace(level) || level == "_" ? "" : $" [{level}]";
-                Debug.WriteLine($"{color}[{timestamp}]{cleanLevel} {message}");
+                Debug.WriteLine($"{color}[{timestamp}]{cleanLevel} {message}"); // Client console only
+
+                if (_printToConsole)
+                {
+                    BaseScript.TriggerServerEvent("dynamicpd:consolePrint", $"{color}[{timestamp}]{cleanLevel} {message}"); // The updater is required by the server to be able to trigger this event
+                }
             }
         }
     }

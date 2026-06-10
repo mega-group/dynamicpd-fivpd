@@ -70,6 +70,9 @@ namespace dynamicpd.Loader
             if (filesToLoad.Count == 0)
             {
                 Debug.WriteLine("[JsonConfigManager] No callout configuration files found in fxmanifest.lua or manifest.json.");
+                BaseScript.TriggerServerEvent("dynamicpd:consolePrint",
+                    "^1[dynamicpd]^7 No callouts were loaded.\n^3[Hint]^7 Check your folder structure."
+                );
                 return;
             }
 
