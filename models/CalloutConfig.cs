@@ -25,6 +25,7 @@ namespace dynamicpd.models
         public float startDistance { get; set; }
         public bool debug { get; set; }
         public bool CFGGen { get; set; } // Internal to easily generate config files if needed
+        public bool printToConsole { get; set; } // allow logging to server console for minimal information
         public List<SuspectConfig> suspects { get; set; }
         public List<VictimConfig> victims { get; set; }
         public LocationData location { get; set; }

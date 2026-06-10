@@ -42,16 +42,21 @@ namespace dynamicpd_callout
                 vehicleModel = "SULTAN",
                 heading = 180f,
                 debug = false,
-                CFGGen = false
+                CFGGen = false,
+                printToConsole = false
             };
 
-            if (config.debug == true)
+            if (config.debug == true && config.printToConsole == false)
             {
-                DebugHelper.EnableDebug(true, config.shortName);
-                //JsonTemplateGenerator.GenerateBlankCalloutTemplate(); // Moved to below so it only triggers if CFGGen is also true but you can bypass by turning this on if you wish -- line will be deleted in the future
+                DebugHelper.EnableDebug(true, config.shortName, false);
             }
 
-            if (config.debug == true && config.CFGGen == true)
+            if (config.debug == true && config.printToConsole == true)
+            {
+                DebugHelper.EnableDebug(true, config.shortName, true);
+            }
+
+            if (config.CFGGen == true)
             {
                 JsonTemplateGenerator.GenerateBlankCalloutTemplate();
             }
