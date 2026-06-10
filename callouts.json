@@ -3,24 +3,24 @@
   "dynamicpd_version": "1.0.1",
   "callouts": [
     {
-      "uid": "burg-callout",
-      "version": "1.0",
-      "for_dynamicpd_version": "0.1",
-      "name": "Burglary in Progress",
-      "description": "Respond to reports of a burglary at a local residence.",
-      "downloadURL": "https://mega-group.github.io/fivepd-json/",
+      "uid": "mega_group_pursuit",
+      "version": "1.0.0",
+      "for_dynamicpd_version": "1.0.1",
+      "name": "Default Callout Pursuit",
+      "description": "A default JSON callout included with dynamicpd-fivepd",
+      "downloadURL": "https://github.com/mega-group/dynamicpd-fivpd/releases",
       "image": "",
-      "searchTerms": ["burglary", "theft", "house", "property", "intruder"]
+      "searchTerms": ["pursuit", "danger"]
     },
     {
-      "uid": "traffic-backup",
-      "version": "1.0",
-      "for_dynamicpd_version": "1.0",
-      "name": "Traffic Stop Backup",
-      "description": "Assist another officer during a routine traffic stop.",
-      "downloadURL": "https://mega-group.github.io/fivepd-json/",
+      "uid": "mega_gourp_manwithgun",
+      "version": "1.0.0",
+      "for_dynamicpd_version": "1.0.1",
+      "name": "Default Callout Man With Gun",
+      "description": "A default JSON callout included with dynamicpd-fivepd",
+      "downloadURL": "https://github.com/mega-group/dynamicpd-fivpd/releases",
       "image": "",
-      "searchTerms": ["traffic", "backup", "stop", "officer", "assist"]
+      "searchTerms": ["man with gun", "gun", "interactive", "danger"]
     }
   ]
 }
