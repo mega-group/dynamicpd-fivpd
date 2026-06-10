@@ -70,7 +70,7 @@ public static class JsonTemplateGenerator
         };
 
         var logger = JsonConvert.SerializeObject(template, Formatting.Indented);
-        DebugHelper.Log($"[JsonTemplate]\n{logger}");
+        DebugHelper.Log("[dynamicpd_callout]", $"[JsonTemplate]\n{logger}");
         return logger;
     }
 }
