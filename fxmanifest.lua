@@ -3,11 +3,17 @@ game 'gta5'
 
 author 'Mega Utilities\' Mega Group'
 description 'This resource checks for updates for the callout & plugin dynamicpd'
-version '1.0.3'
+version '1.0.4'
 pre_version '1.0.3'
 
 
 server_script 'updater.lua'
+
+changelog_1_0_4 [[
+- Updater will now be required
+- Fix automatic discovery
+- Fix dynamicpd not working (issue due to dynamicdiscovery and namespace most likely)
+]]
 
 changelog_1_0_3 [[
 - Enhance Updater once more (prepare for FivePD V2?)
