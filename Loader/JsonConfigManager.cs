@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using CitizenFX.Core;
 using dynamicpd.models;
 using Newtonsoft.Json;
@@ -10,79 +10,114 @@ namespace dynamicpd.Loader
 {
     public static class JsonConfigManager
     {
-        public static List<CalloutConfig> Configs { get; private set; }
+        public static List<CalloutConfig> Configs { get; private set; } = new List<CalloutConfig>();
         private static HashSet<string> checkedCallouts = new HashSet<string>();
+        public static bool IsLoaded { get; private set; } = false;
+        private static bool receivedServerReply = false;
 
-        static JsonConfigManager()
+        public static async Task Initialize()
         {
-            Configs = new List<CalloutConfig>();
-            LoadConfigs();
+            if (IsLoaded) return;
+
+            try
+            {
+                Debug.WriteLine("[JsonConfigManager] Triggering cross-resource directory scan request to dynamicpd_updater...");
+                receivedServerReply = false;
+
+                BaseScript.TriggerServerEvent("dynamicpd:requestCalloutFiles");
+
+                int timeoutTicks = 0;
+                while (!receivedServerReply && timeoutTicks < 500)
+                {
+                    await BaseScript.Delay(10);
+                    timeoutTicks++;
+                }
+
+                if (!IsLoaded)
+                {
+                    Debug.WriteLine("^3[JsonConfigManager] Updater response window timed out or failed. Reverting to local manifest.json backup loop...^7");
+                    LoadFromManifestFallback();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"^1[JsonConfigManager] Critical defect flagged during startup initialization: {ex}^7");
+                if (!IsLoaded) LoadFromManifestFallback();
+            }
         }
 
-        public static void LoadConfigs()
+        public static void OnCalloutFilesReceived(string jsonSerializedList)
         {
-            if (Configs.Count > 0) return;
+            if (IsLoaded) return;
 
-            List<string> filesToLoad = new List<string>();
+            receivedServerReply = true;
 
-            // Attempt to load from fxmanifest.lua
-            var fxmanifest = LoadResourceFile(GetCurrentResourceName(), "fxmanifest.lua");
-            if (!string.IsNullOrEmpty(fxmanifest))
+            try
             {
-                var matches = System.Text.RegularExpressions.Regex.Matches(
-                    fxmanifest,
-                    @"callouts\/dynamicpd_callouts\/([A-Za-z0-9_\-\.]+\.json)"
-                );
-
-                foreach (System.Text.RegularExpressions.Match m in matches)
+                var discoveredFiles = JsonConvert.DeserializeObject<List<string>>(jsonSerializedList);
+                if (discoveredFiles == null || discoveredFiles.Count == 0)
                 {
-                    filesToLoad.Add(m.Groups[1].Value);
+                    Debug.WriteLine("^3[JsonConfigManager] Server returned 0 files in dynamicpd_callouts folder.^7");
+                    LoadFromManifestFallback();
+                    return;
                 }
 
-                if (filesToLoad.Count > 0)
+                Debug.WriteLine($"^2[JsonConfigManager] Cross-Resource Discovery Success! Processing {discoveredFiles.Count} entries from updater.^7");
+                CompileTargetFiles(discoveredFiles);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"^1[JsonConfigManager] Error processing server asset mapping: {ex.Message}^7");
+                LoadFromManifestFallback();
+            }
+        }
+
+        private static void LoadFromManifestFallback()
+        {
+            if (IsLoaded) return;
+
+            try
+            {
+                var manifestJson = LoadResourceFile("fivepd", "callouts/dynamicpd_callouts/manifest.json");
+                if (string.IsNullOrEmpty(manifestJson))
                 {
-                    Debug.WriteLine("[JsonConfigManager] Loaded callout list from fxmanifest.lua.");
+                    Debug.WriteLine("^1[JsonConfigManager] Critical Failure: No callout maps found via updater, and manifest.json is missing or blank.^7");
+                    IsLoaded = true;
+                    return;
                 }
-            }
 
-            // Fallback to manifest.json if no files were found in fxmanifest
-            if (filesToLoad.Count == 0)
+                var filesToLoad = JsonConvert.DeserializeObject<List<string>>(manifestJson) ?? new List<string>();
+                Debug.WriteLine($"[JsonConfigManager] Fallback verified {filesToLoad.Count} target configs out of local manifest.json.");
+                CompileTargetFiles(filesToLoad);
+            }
+            catch (Exception ex)
             {
-                var manifestJson = LoadResourceFile(GetCurrentResourceName(), "callouts/dynamicpd_callouts/manifest.json");
-                if (!string.IsNullOrEmpty(manifestJson))
+                Debug.WriteLine($"^1[JsonConfigManager] Fallback manifest processing dropped unexpected exception: {ex.Message}^7");
+                IsLoaded = true;
+            }
+        }
+
+        private static void CompileTargetFiles(List<string> files)
+        {
+            string targetFolder = "callouts/dynamicpd_callouts";
+
+            foreach (var rawName in files)
+            {
+                if (string.IsNullOrEmpty(rawName)) continue;
+
+                string fileName = rawName.Replace("./", "").Replace("\\", "/").Trim();
+                string fullPath = $"{targetFolder}/{fileName}";
+
+                if (fileName.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
                 {
-                    try
-                    {
-                        filesToLoad = JsonConvert.DeserializeObject<List<string>>(manifestJson) ?? new List<string>();
-                        if (filesToLoad.Count > 0)
-                        {
-                            Debug.WriteLine("[JsonConfigManager] Loaded callout list from manifest.json fallback.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"[JsonConfigManager] Failed to parse manifest.json fallback: {ex.Message}");
-                    }
+                    Debug.WriteLine($"^5[JsonConfigManager] Script Target Registered (LUA Engine Context Ready): fivepd/{fullPath}^7");
+                    continue;
                 }
-            }
 
-            // Abort if both methods failed to find any files
-            if (filesToLoad.Count == 0)
-            {
-                Debug.WriteLine("[JsonConfigManager] No callout configuration files found in fxmanifest.lua or manifest.json.");
-                BaseScript.TriggerServerEvent("dynamicpd:consolePrint",
-                    "^1[dynamicpd]^7 No callouts were loaded.\n^3[Hint]^7 Check your folder structure."
-                );
-                return;
-            }
-
-            // Parse the configs using our populated list
-            foreach (var fileName in filesToLoad)
-            {
-                var json = LoadResourceFile(GetCurrentResourceName(), $"callouts/dynamicpd_callouts/{fileName}");
+                var json = LoadResourceFile("fivepd", fullPath);
                 if (string.IsNullOrEmpty(json))
                 {
-                    Debug.WriteLine($"[JsonConfigManager] Could not load {fileName}");
+                    Debug.WriteLine($"^3[JsonConfigManager] Skipping file (File unreadable or unmapped by fivepd stream runtime): {fullPath}^7");
                     continue;
                 }
 
@@ -92,45 +127,48 @@ namespace dynamicpd.Loader
                     if (cfg != null && !string.IsNullOrEmpty(cfg.shortName))
                     {
                         Configs.Add(cfg);
-                        Debug.WriteLine($"[JsonConfigManager] Loaded config: {cfg.shortName}");
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"[JsonConfigManager] Invalid config in {fileName}");
+                        Debug.WriteLine($"^2[JsonConfigManager] Successfully Loaded: {cfg.shortName} ({fileName})^7");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[JsonConfigManager] Failed to parse {fileName}: {ex.Message}");
+                    Debug.WriteLine($"^1[JsonConfigManager] Schema validation error while parsing {fileName}: {ex.Message}^7");
                 }
             }
 
-            // Run the update checker
-            foreach (var cfg in Configs)
+            IsLoaded = true;
+            TriggerUpdateChecks();
+        }
+
+        private static void TriggerUpdateChecks()
+        {
+            try
             {
-                if (checkedCallouts.Contains(cfg.shortName))
-                    continue;
+                foreach (var cfg in Configs)
+                {
+                    if (checkedCallouts.Contains(cfg.shortName)) continue;
+                    if (string.IsNullOrEmpty(cfg.updateURL) || string.IsNullOrEmpty(cfg.version)) continue;
 
-                if (string.IsNullOrEmpty(cfg.updateURL) || string.IsNullOrEmpty(cfg.version)) continue;
-
-                checkedCallouts.Add(cfg.shortName);
-
-                var argsArray = new object[] { cfg.shortName, cfg.version, cfg.updateURL };
-                string payload = JsonConvert.SerializeObject(argsArray);
-                int byteLen = Encoding.UTF8.GetBytes(payload).Length;
-
-                BaseScript.TriggerServerEvent("dynamicpd:checkUpdate", cfg.shortName, cfg.version, cfg.updateURL);
+                    checkedCallouts.Add(cfg.shortName);
+                    BaseScript.TriggerServerEvent("dynamicpd:checkUpdate", cfg.shortName, cfg.version, cfg.updateURL);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[JsonConfigManager] Update checker postponed: Server event framework not ready ({ex.Message})");
             }
         }
 
         public static CalloutConfig GetRandomConfig()
         {
-            if (Configs.Count == 0) return null;
+            if (Configs == null || Configs.Count == 0) return null;
             var rnd = new Random();
             return Configs[rnd.Next(Configs.Count)];
         }
+
         public static CalloutConfig GetConfigByShortName(string shortName)
         {
+            if (Configs == null || string.IsNullOrEmpty(shortName)) return null;
             return Configs.Find(cfg => cfg.shortName.Equals(shortName, StringComparison.OrdinalIgnoreCase));
         }
     }

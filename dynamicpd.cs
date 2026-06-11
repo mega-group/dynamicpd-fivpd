@@ -15,10 +15,10 @@ using Newtonsoft.Json;
 using static CitizenFX.Core.Native.API;
 using static dynamicpd.Logic.SpawnSuspects;
 
-namespace dynamicpd_callout
+namespace dynamicpd
 {
     [CalloutProperties("dynamicpd", "Mega Group", "1.0.0")]
-    public class dynamicpd : Callout
+    public class dynamicpdcallout : Callout
     {
         private CalloutConfig config;
         private Vector3 finalLocation;
@@ -29,7 +29,7 @@ namespace dynamicpd_callout
         private bool suspectsInitialized = false;
         private Func<Task> suspectMonitorTickHandler;
         
-        public dynamicpd()
+        public dynamicpdcallout()
         {
             config = JsonConfigManager.GetRandomConfig() ?? new CalloutConfig
             {
