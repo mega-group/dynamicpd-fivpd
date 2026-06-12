@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Mega Utilities\' Mega Group'
 description 'This resource checks for updates for the callout & plugin dynamicpd'
-version '1.0.4'
+version '1.0.5'
 pre_version '1.0.5'
 
 
@@ -11,6 +11,9 @@ server_script 'updater.lua'
 
 changelog_1_0_5 [[
 - downloadURL to config for the direct download URL of your callout/plugins
+- New cleanup logic & moved to after call cancel. NOTE: A red dot will appear to "flash" and remain forever if the call is canceled before the NPC is deleted
+- Improved locations to help keep NPCs on the road (hopefully?)
+- & more
 ]]
 
 changelog_1_0_4 [[
