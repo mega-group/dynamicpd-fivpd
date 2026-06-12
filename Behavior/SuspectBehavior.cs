@@ -57,7 +57,7 @@ namespace dynamicpd.Behavior
 
                     if (ped.IsInVehicle())
                     {
-                        API.TaskVehicleShootAtPed(ped.Handle, playerPed.Handle, 9000f);
+                        ped.Task.VehicleShootAtPed(playerPed);
                     }
                     else
                     {
