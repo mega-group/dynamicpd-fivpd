@@ -447,7 +447,7 @@ namespace dynamicpd
 
         public override void OnCancelBefore()
         {
-            base.OnCancelBefore();
+            /*base.OnCancelBefore();
             DebugHelper.Log(config, "[dynamicpd_callout] Starting entity cleanup...", "SUCCESS");
 
             try
@@ -494,12 +494,57 @@ namespace dynamicpd
 
             isCalloutFinished = true;
             Tick -= suspectMonitorTickHandler;
-            DebugHelper.Log(config, "[dynamicpd_callout] Entity cleanup complete.", "SUCCESS");
+            DebugHelper.Log(config, "[dynamicpd_callout] Entity cleanup complete.", "SUCCESS");*/
         }
 
         public override void OnCancelAfter()
         {
             // additional cleanup if needed
+            try
+            {
+                foreach (var s in spawnedSuspects)
+                {
+                    if (s?.Ped != null && s.Ped.Exists())
+                    {
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Removing blip for suspect ped {s.Ped.Handle}");
+                        Utilities.SyncBlipDelete(s.PedBlip);
+
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Cleaning suspect: {s.Ped.Handle}");
+                        s.PedBlip?.Delete();
+
+                        s.Ped.IsPersistent = false;
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Set suspect {s.Ped.Handle} as non-persistent.");
+
+                        s.Ped.Delete();
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted suspect ped {s.Ped.Handle}.");
+                    }
+
+                    if (s?.Vehicle != null && s.Vehicle.Exists())
+                    {
+                        Utilities.SyncBlipDelete(s.VehBlip);
+                        s.VehBlip?.Delete();
+                        s.Vehicle.Delete();
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted suspect vehicle {s.Vehicle.Handle}.");
+                    }
+                }
+
+                foreach (var v in spawnedVictims)
+                {
+                    if (v != null && v.Exists())
+                    {
+                        v.Delete();
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted victim ped {v.Handle}.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                DebugHelper.Log(config, $"[dynamicpd_callout] Exception during cleanup: {ex}", "ERROR");
+            }
+
+            isCalloutFinished = true;
+            Tick -= suspectMonitorTickHandler;
+            DebugHelper.Log(config, "[dynamicpd_callout] Entity cleanup complete.", "SUCCESS");
         }
 
         public override void OnBackupReceived(Player player)

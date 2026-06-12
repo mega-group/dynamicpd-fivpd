@@ -19,7 +19,7 @@ namespace dynamicpd.models
         public string vehicleId { get; set; }
         public int? seatIndex { get; set; }
         public bool? excludeFromTrafficStop { get; set; }
-        public bool hasBlip { get; set; } = false;
+        public bool hasBlip { get; set; } = true;
         public string blipColor { get; set; } = "Red";
         public List<PedQuestionConfig> questions { get; set; }
         public VehicleDataConfig vehicleData { get; set; }
