@@ -148,7 +148,7 @@ namespace dynamicpd
                 $"\n  debug: {config.debug}" +
                 $"\n  suspects: {(config.suspects?.Count.ToString() ?? "null")}" +
                 $"\n  victims: {(config.victims?.Count.ToString() ?? "null")}" +
-                $"\n  spawn location: ({finalLocation.X}, {finalLocation.Y}, {finalLocation.Z})" + // Updated log statement
+                $"\n  spawn location: ({finalLocation.X}, {finalLocation.Y}, {finalLocation.Z})" +
                 $"\n  locations: {(config.locations?.Count.ToString() ?? "null")}", "SUCCESS"
             );
             DebugHelper.Log(config, $"Full Config JSON:\n{JsonConvert.SerializeObject(config, Formatting.Indented)}", "DEBUG");
@@ -449,7 +449,7 @@ namespace dynamicpd
 
         public override void OnCancelBefore()
         {
-            // Keeping commented framework hooks intact per your codebase layout
+            // left for later if necessary
         }
 
         public override void OnCancelAfter()
