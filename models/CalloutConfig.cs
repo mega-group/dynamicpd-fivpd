@@ -9,6 +9,7 @@ namespace dynamicpd.models
     public class CalloutConfig
     {
         public string updateURL { get; set; }
+        public string downloadURL { get; set; }
         public string version { get; set; }
         public string shortName { get; set; }
         public string description { get; set; }

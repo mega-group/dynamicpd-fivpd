@@ -150,7 +150,7 @@ namespace dynamicpd.Loader
                     if (string.IsNullOrEmpty(cfg.updateURL) || string.IsNullOrEmpty(cfg.version)) continue;
 
                     checkedCallouts.Add(cfg.shortName);
-                    BaseScript.TriggerServerEvent("dynamicpd:checkUpdate", cfg.shortName, cfg.version, cfg.updateURL);
+                    BaseScript.TriggerServerEvent("dynamicpd:checkUpdate", cfg.shortName, cfg.version, cfg.updateURL, cfg.downloadURL);
                 }
             }
             catch (Exception ex)
