@@ -32,29 +32,43 @@ namespace dynamicpd.Helpers
                 origin.Z
             );
         }
-        public static Vector3 GetSafeRandomNearbyLocation(Vector3 origin)
+        public static Vector3 GetSafeRandomNearbyLocation(Vector3 origin, out float heading)
         {
             var rand = new Random();
+            heading = 0.0f;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 15; i++)
             {
                 double angle = rand.NextDouble() * Math.PI * 2;
-                double distance = rand.Next(30, 80);
+                double distance = rand.Next(40, 90);
 
                 float x = origin.X + (float)(Math.Cos(angle) * distance);
                 float y = origin.Y + (float)(Math.Sin(angle) * distance);
                 float z = origin.Z;
 
-                Vector3 safeCoord = new Vector3();
-                bool found = API.GetSafeCoordForPed(x, y, z, true, ref safeCoord, 0);
+                Vector3 roadCoord = new Vector3();
+                float outHeading = 0f;
 
-                if (found)
+                bool foundNode = API.GetClosestVehicleNodeWithHeading(x, y, z, ref roadCoord, ref outHeading, 1, 3.0f, 0);
+
+                if (foundNode)
                 {
-                    return safeCoord;
+                    float waterHeight = 0f;
+                    bool isWater = API.GetWaterHeight(roadCoord.X, roadCoord.Y, roadCoord.Z, ref waterHeight);
+
+                    if (!isWater)
+                    {
+                        heading = outHeading;
+                        return roadCoord;
+                    }
                 }
             }
 
             return origin;
+        }
+        public static Vector3 GetSafeRandomNearbyLocation(Vector3 origin)
+        {
+            return GetSafeRandomNearbyLocation(origin, out _);
         }
         public static Vector3 GetSafeRandomLocationNearby()
         {

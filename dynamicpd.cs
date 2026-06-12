@@ -28,7 +28,7 @@ namespace dynamicpd
         private List<Ped> spawnedVictims = new List<Ped>();
         private bool suspectsInitialized = false;
         private Func<Task> suspectMonitorTickHandler;
-        
+
         public dynamicpdcallout()
         {
             config = JsonConfigManager.GetRandomConfig() ?? new CalloutConfig
@@ -130,6 +130,10 @@ namespace dynamicpd
             spawnedSuspects.Clear();
             spawnedVictims.Clear();
 
+            finalLocation = this.Location;
+
+            var playerPos = Game.Player.Character?.Position ?? new Vector3(0f, 0f, 72f);
+
             DebugHelper.Log(config, "[dynamicpd_callout] Callout Accepted:" +
                 $"\n  shortName: {config.shortName}" +
                 $"\n  description: {config.description}" +
@@ -144,7 +148,7 @@ namespace dynamicpd
                 $"\n  debug: {config.debug}" +
                 $"\n  suspects: {(config.suspects?.Count.ToString() ?? "null")}" +
                 $"\n  victims: {(config.victims?.Count.ToString() ?? "null")}" +
-                $"\n  location: {(config.location != null ? $"({config.location.x}, {config.location.y}, {config.location.z})" : "null")}" +
+                $"\n  spawn location: ({finalLocation.X}, {finalLocation.Y}, {finalLocation.Z})" + // Updated log statement
                 $"\n  locations: {(config.locations?.Count.ToString() ?? "null")}", "SUCCESS"
             );
             DebugHelper.Log(config, $"Full Config JSON:\n{JsonConvert.SerializeObject(config, Formatting.Indented)}", "DEBUG");
@@ -351,7 +355,6 @@ namespace dynamicpd
                 DebugHelper.Log(config, $"[dynamicpd_callout] Exception during OnAccept: {ex}", "ERROR");
             }
         }
-        
 
 
         private PedData.License CreateLicense(LicenseConfig cfg)
@@ -365,7 +368,6 @@ namespace dynamicpd
                     ? status : PedData.License.Status.Valid
             };
         }
-
 
 
         private async Task SuspectMonitorTick()
@@ -447,95 +449,51 @@ namespace dynamicpd
 
         public override void OnCancelBefore()
         {
-            /*base.OnCancelBefore();
-            DebugHelper.Log(config, "[dynamicpd_callout] Starting entity cleanup...", "SUCCESS");
-
-            try
-            {
-                foreach (var s in spawnedSuspects)
-                {
-                    if (s?.Ped != null && s.Ped.Exists())
-                    {
-                        DebugHelper.Log(config, $"[dynamicpd_callout] Removing blip for suspect ped {s.Ped.Handle}");
-                        Utilities.SyncBlipDelete(s.PedBlip);
-
-                        DebugHelper.Log(config, $"[dynamicpd_callout] Cleaning suspect: {s.Ped.Handle}");
-                        s.PedBlip?.Delete();
-
-                        s.Ped.IsPersistent = false;
-                        DebugHelper.Log(config, $"[dynamicpd_callout] Set suspect {s.Ped.Handle} as non-persistent.");
-
-                        s.Ped.Delete();
-                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted suspect ped {s.Ped.Handle}.");
-                    }
-
-                    if (s?.Vehicle != null && s.Vehicle.Exists())
-                    {
-                        Utilities.SyncBlipDelete(s.VehBlip);
-                        s.VehBlip?.Delete();
-                        s.Vehicle.Delete();
-                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted suspect vehicle {s.Vehicle.Handle}.");
-                    }
-                }
-
-                foreach (var v in spawnedVictims)
-                {
-                    if (v != null && v.Exists())
-                    {
-                        v.Delete();
-                        DebugHelper.Log(config, $"[dynamicpd_callout] Deleted victim ped {v.Handle}.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                DebugHelper.Log(config, $"[dynamicpd_callout] Exception during cleanup: {ex}", "ERROR");
-            }
-
-            isCalloutFinished = true;
-            Tick -= suspectMonitorTickHandler;
-            DebugHelper.Log(config, "[dynamicpd_callout] Entity cleanup complete.", "SUCCESS");*/
+            // Keeping commented framework hooks intact per your codebase layout
         }
 
         public override void OnCancelAfter()
         {
             try
             {
-                DebugHelper.Log(config, "[dynamicpd_callout] Starting complete detached cleanup pipeline...", "SUCCESS");
+                DebugHelper.Log(config, "[dynamicpd_callout] Starting decoupled clean teardown pipeline...", "SUCCESS");
 
                 foreach (var s in spawnedSuspects)
                 {
-                    if (s != null)
+                    if (s == null) continue;
+
+                    if (s.PedBlip != null)
                     {
-                        if (s.PedBlip != null)
-                        {
-                            DebugHelper.Log(config, $"[dynamicpd_callout] Purging standalone ped blip reference.");
-                            Utilities.SyncBlipDelete(s.PedBlip);
-                            if (s.PedBlip.Exists()) s.PedBlip.Delete();
-                        }
+                        DebugHelper.Log(config, "[dynamicpd_callout] Purging standalone ped blip reference.");
+                        Utilities.SyncBlipDelete(s.PedBlip);
+                        if (s.PedBlip.Exists()) s.PedBlip.Delete();
+                    }
 
-                        if (s.VehBlip != null)
-                        {
-                            DebugHelper.Log(config, $"[dynamicpd_callout] Purging standalone vehicle blip reference.");
-                            Utilities.SyncBlipDelete(s.VehBlip);
-                            if (s.VehBlip.Exists()) s.VehBlip.Delete();
-                        }
+                    if (s.VehBlip != null)
+                    {
+                        DebugHelper.Log(config, "[dynamicpd_callout] Purging standalone vehicle blip reference.");
+                        Utilities.SyncBlipDelete(s.VehBlip);
+                        if (s.VehBlip.Exists()) s.VehBlip.Delete();
+                    }
+                }
 
-                        if (s.Ped != null && s.Ped.Exists())
-                        {
-                            API.SetEntityAsMissionEntity(s.Ped.Handle, false, true);
-                            s.Ped.IsPersistent = false;
+                foreach (var s in spawnedSuspects)
+                {
+                    if (s == null) continue;
 
-                            s.Ped.Delete();
-                            DebugHelper.Log(config, $"[dynamicpd_callout] Cleanly deleted ped engine handle: {s.Ped.Handle}.");
-                        }
+                    if (s.Ped != null && s.Ped.Exists())
+                    {
+                        API.SetEntityAsMissionEntity(s.Ped.Handle, false, true);
+                        s.Ped.IsPersistent = false;
+                        s.Ped.Delete();
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Cleanly deleted ped engine handle: {s.Ped.Handle}.");
+                    }
 
-                        if (s.Vehicle != null && s.Vehicle.Exists())
-                        {
-                            API.SetEntityAsMissionEntity(s.Vehicle.Handle, false, true);
-                            s.Vehicle.Delete();
-                            DebugHelper.Log(config, $"[dynamicpd_callout] Cleanly deleted vehicle engine handle: {s.Vehicle.Handle}.");
-                        }
+                    if (s.Vehicle != null && s.Vehicle.Exists())
+                    {
+                        API.SetEntityAsMissionEntity(s.Vehicle.Handle, false, true);
+                        s.Vehicle.Delete();
+                        DebugHelper.Log(config, $"[dynamicpd_callout] Cleanly deleted vehicle engine handle: {s.Vehicle.Handle}.");
                     }
                 }
 
@@ -554,7 +512,6 @@ namespace dynamicpd
             }
             finally
             {
-                isCalloutFinished = true;
                 Tick -= suspectMonitorTickHandler;
                 DebugHelper.Log(config, "[dynamicpd_callout] Decoupled lifecycle teardown completed successfully.", "SUCCESS");
             }
